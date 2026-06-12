@@ -26,6 +26,28 @@ sudo pacman -S emacs
 For maximum performance, users often look to the **AUR (Arch User Repository)**:
 - **`emacs-nativecomp`**: Enables native compilation of Elisp files to machine code using `libgccjit`. This significantly improves the responsiveness of the UI and the speed of background tasks.
 
+## 2b. Installation on Ubuntu
+For users on Ubuntu or Debian-based systems, Emacs is available through several channels.
+
+### Standard APT Installation
+```bash
+sudo apt update
+sudo apt install emacs
+```
+
+### Snap Installation (Easiest for latest stable)
+```bash
+sudo snap install emacs --classic
+```
+
+### PPA (For the absolute latest versions)
+If the version in the default repositories is too old, use the popular Kelleyk PPA:
+```bash
+sudo add-apt-repository ppa:kelleyk/emacs
+sudo apt update
+sudo apt install emacs29 # or latest available
+```
+
 ## 3. Core Terminology
 Understanding the Emacs nomenclature is critical for navigating its documentation.
 
