@@ -105,6 +105,16 @@ emacs -nw
 ### WSL Path Conflicts
 When calling external tools from Emacs in WSL, you might encounter an `Exec format error`. This often happens when Emacs tries to execute a Windows binary (`.exe`) directly through a Linux-style path without the proper interop settings enabled in `/etc/wsl.conf`.
 
+### Automatic Backup Files (`filename~`)
+When editing a file, you may notice a new file appearing with a tilde suffix (e.g., `changelog.md~`). This is an automatic backup created by Emacs.
+
+- **Purpose**: It preserves the state of the file *before* your most recent save.
+- **Disabling**: To stop this behavior, add `(setq make-backup-files nil)` to your configuration.
+- **Centralizing**: To prevent clutter while keeping backups, you can move them to a dedicated folder:
+  ```elisp
+  (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+  ```
+
 ## 8. Next Steps
 Once comfortable with the basics, explore these avenues for customization:
 
