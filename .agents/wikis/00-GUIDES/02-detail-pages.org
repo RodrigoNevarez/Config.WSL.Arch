@@ -1,0 +1,80 @@
+#+TITLE: Wiki Detail Page Generation Guide
+
+This guide details the procedure for generating, structuring, and linking dedicated topic detail pages in the knowledge wiki. When requested to expand a specific topic by its unique ID, follow the workflow outlined below to create a detailed sub-page and establish bidirectional links.
+
+* Detail Page Workflow Overview
+The detail page generation process expands a brief topic node in a parent wiki file into its own standalone Org-mode document. This ensures that the main wiki index files remain clean and uncluttered, while detailed research is offloaded to separate files.
+
+** Workflow Steps
+1. *Locate the Node*: Search all Org-mode files in the workspace for a node containing the specified target UUID in its =:ID:= property drawer.
+2. *Read Parent Context*: Retrieve the header text and any existing description/content of the matched node to understand the topic.
+3. *Research & Expand*: Search internal documentation or perform a web search to gather comprehensive information, explanations, code snippets, and resources about the topic.
+4. *Create the Detail File*: Create a new Org-mode file named =<UUID>.org= in the same directory root as the parent file.
+5. *Link Back to Parent*: Include a clear relative hyperlink in the detail page pointing back to the parent file.
+6. *Link from Parent*: Modify the parent node in the parent file to insert a relative link pointing to the new detail page.
+
+** CRITICAL UUID PLACEMENT RULE
+- *CRITICAL:* **NEVER write the UUID directly in any heading text** (neither in the parent file nor inside the generated detail file).
+- The UUID must reside strictly inside the properties drawer (=:PROPERTIES:= drawer containing the =:ID:= property) of the respective node. The headings themselves must remain clean and human-readable.
+
+
+* Bidirectional Linking Specifications
+To maintain integrity and ease of navigation, both files must refer to each other using relative file paths.
+
+** 1. Child Page Link to Parent (=<UUID>.org=)
+The generated detail page must include a metadata section or a header linking back to the parent file:
+- Format: =[[file:<parent-filename>.org::#<node-custom-id>][Back to Parent: <Parent Header Name>]]= or simply =[[file:<parent-filename>.org][Back to Parent]]=
+
+** 2. Parent Page Link to Child
+The parent node's content must be updated to reference the new child page directly underneath the header and property drawer:
+- Format: =[[file:<UUID>.org][Detailed Page]]= or =- *Detailed Guide:* [[file:<UUID>.org][<Topic Name> Guide]]=
+
+* Detail Page Template (=<UUID>.org=)
+When creating the new detail page, use the following standard structure:
+
+#+BEGIN_SRC org
+#+TITLE: Detail Page: Topic Name
+#+AUTHOR: AGY Knowledge Agent
+#+OPTIONS: toc:nil num:nil
+
+* Parent Reference
+  - *Back to Parent:* [[file:parent-filename.org][Parent Topic Name]]
+
+* Overview
+  A comprehensive overview of the topic, explaining its core concepts and relevance.
+
+* Key Details & Research
+  - *Detail 1:* Detailed explanation.
+  - *Detail 2:* Detailed explanation.
+
+* Code / Implementation Examples (If Applicable)
+  #+BEGIN_SRC [language]
+  // Example code or configuration
+  #+END_SRC
+
+* Further Resources
+  - External links or related internal wiki pages.
+#+END_SRC
+
+* Example Parent Page Modification
+Below is an example of how the parent file should be updated to link to the new detail page:
+
+** Before Update
+#+BEGIN_SRC org
+*** Topic Name
+    :PROPERTIES:
+    :ID:       12345678-abcd-1234-abcd-123456789abc
+    :END:
+    A brief description of the topic.
+#+END_SRC
+
+** After Update
+#+BEGIN_SRC org
+*** Topic Name
+    :PROPERTIES:
+    :ID:       12345678-abcd-1234-abcd-123456789abc
+    :END:
+    A brief description of the topic.
+
+    - *Detailed Guide:* [[file:12345678-abcd-1234-abcd-123456789abc.org][Topic Name Detail Page]]
+#+END_SRC

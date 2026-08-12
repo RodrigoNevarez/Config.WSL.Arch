@@ -1,0 +1,94 @@
+#+TITLE: Wiki Index Creation & Maintenance Guide (Starter's Guide)
+
+This guide details how to create, structure, and maintain the central index file (typically =index.org=) for an Emacs Org-mode wiki. A well-structured index serves as the entry point, navigation hub, and structural backbone of a personal or collaborative knowledge base.
+
+* Wiki Index Structure & Hierarchy
+A wiki index utilizes Emacs Org-mode format to categorize and link various notes, documents, and reference pages. It should be organized hierarchically to allow quick navigation.
+
+** The UUID Placement Rule
+- *Requirement:* Every node in the wiki index or sub-pages MUST include a =:PROPERTIES:= drawer containing a unique =:ID:= (UUIDv4) for linking, referencing, and semantic indexing.
+- *CRITICAL RULE:* **NEVER write the UUID directly in the heading text.** The heading must contain only the clean, human-readable title. The UUID must reside strictly inside the properties drawer.
+
+** Node Levels
+- *Level 1 (*)*: Major namespaces or domains (e.g., [[*Quick Links][Quick Links]], [[*Projects][Projects]], [[*Knowledge Base][Knowledge Base]], [[*Archive][Archive]]).
+- *Level 2 (**)*: Sub-categories, subject areas, or status groups (e.g., =Active Projects=, =Software Engineering=, =Meeting Notes=).
+- *Level 3 (***)*: Specific topic nodes or direct links to individual wiki pages (e.g., =[[file:projects/project-alpha.org][Project Alpha]]=).
+
+* Org-mode Wiki Index Template
+Below is the standard template for a wiki index file (=index.org=). It incorporates metadata, quick links, category navigation, and links to sub-pages:
+
+#+BEGIN_SRC org
+#+TITLE: Personal Knowledge Wiki Index
+#+AUTHOR: Your Name
+#+DESCRIPTION: Central navigation hub and index for the knowledge wiki.
+#+OPTIONS: toc:nil num:nil
+
+* Quick Links
+  Frequently accessed pages and active bookmarks.
+  - [[file:daily.org][Daily Scratchpad]] - Quick notes for today.
+  - [[file:projects/active-tasks.org][Active Tasks]] - Core task board.
+
+* Projects
+  Active and planned projects.
+  
+** Active
+   - [[file:projects/project-alpha.org][Project Alpha]] - Core web application development.
+   - [[file:projects/project-beta.org][Project Beta]] - System migration.
+
+** Backlog
+   - [[file:projects/refactoring-ci.org][CI Pipeline Refactoring]] - Planned improvements.
+
+* Knowledge Base
+  Categorized resource guides, study notes, and research.
+
+** Software Engineering
+   - [[file:kb/emacs.org][Emacs & Org-mode]] - Configurations and shortcuts.
+   - [[file:kb/databases.org][Database Optimization]] - Performance tuning tips.
+
+** System Administration
+   - [[file:kb/linux-commands.org][Linux Command Reference]] - Handy CLI utilities.
+
+* Archive
+  Completed projects and outdated reference material.
+  - [[file:archive/2025-goals.org][2025 Goals & Retrospective]]
+#+END_SRC
+
+* Linking & Navigation in Org-mode
+A wiki relies heavily on hyperlinks. Org-mode supports multiple linking formats depending on the target destination:
+
+** File Links (Recommended)
+To link to a wiki page in a different file, use the =file:= prefix with a relative path:
+- Link to a file in the same directory: =[[file:page.org][Page Title]]=
+- Link to a file in a subdirectory: =[[file:kb/emacs.org][Emacs Guide]]=
+- Link to a specific header inside another file: =[[file:kb/emacs.org::*Shortcuts][Emacs Shortcuts]]=
+
+** ID-based Links (For Org-Roam or Bi-directional Linking)
+For complex wikis where files might be moved across folders, use unique IDs. Every file or header can have a unique =:ID:= property drawer:
+- Link to a node by ID: =[[id:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx][Node Title]]=
+
+** Internal Headers
+To link to a section within the index file itself:
+- Link to a header: =[[*Knowledge Base][Go to Knowledge Base]]=
+
+* How to Insert and Generate Links
+Emacs provides built-in utilities to quickly create and manage links:
+
+** Inserting Links
+- Use =C-c C-l= (~org-insert-link~) to prompt for a link destination and description.
+- To store a link to a file you are currently viewing, run =M-x org-store-link= (or bind to =C-c l s=), then run =C-c C-l= in the index to insert it.
+
+** Generating ID Properties
+If utilizing ID-based linking, ensure nodes have unique IDs:
+- Run =M-x org-id-get-create= to automatically generate a =:PROPERTIES:= drawer with a unique UUIDv4.
+- For non-Emacs setups, manually define properties:
+  #+BEGIN_SRC org
+  :PROPERTIES:
+  :ID:       xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  :END:
+  #+END_SRC
+
+* Best Practices for Wiki Index Maintenance
+1. *Use Relative Paths*: Always use relative paths for file links (e.g., =file:kb/emacs.org= instead of =file:/home/user/wiki/kb/emacs.org=) to ensure the wiki remains portable across machines.
+2. *Keep the Hierarchy Clean*: Organize wiki files into folders (e.g., =projects/=, =kb/=, =archive/=) and reflect this modular structure in the main index.
+3. *Refactor Regularly*: As the wiki grows, prune outdated links, move completed items to the =Archive= section, and group orphaned pages under relevant sub-categories.
+4. *Consistent Naming*: Use lowercase and hyphens for filenames (e.g., =project-alpha.org= rather than =Project_Alpha.Org=) to prevent OS-level path mismatches.

@@ -26,11 +26,13 @@ These packages are explicitly installed via the `pacman` package manager.
 | `zsh` | 5.9.1-1 | A very advanced and customizable shell |
 
 *Note: `curl` (v8.20.0-7) is also installed as a core dependency for several of the above packages.*
+*Note: `realpath` is provided by `coreutils` (part of the `base` package). See [REALPATH.md](file:///root/repos/arch/docs/dependencies/REALPATH.md) for its installation and emulation guide.*
 
 ## 2. Development Tools
 
 | Tool | Version | Installation Method |
 |------|---------|---------------------|
+| `antigravity` | 1.0.16 | Manual binary installation (installed as `agy`) |
 | `nvm` (Node Version Manager) | 0.40.5 | Manual script installation via `curl` |
 | `starship` | 1.25.1 | Pacman |
 | `zellij` | 0.44.3 | Pacman |
@@ -54,4 +56,4 @@ Installed globally for Node.js v24.16.0:
 | `npm` | 11.13.0 |
 
 ---
-*Report generated on 2026-06-12.*
+*Report updated on 2026-07-05.*
