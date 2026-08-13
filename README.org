@@ -23,15 +23,19 @@ to maintain that wiki.
 
 [[file:config/][config/]] holds the actual dotfiles tracked by this repo:
 =.bashrc=, =.bash_profile=, and =.gitconfig= for the shell, and
-=init.el= for Emacs (deployed to =~/.emacs.d/init.el=). A script under
-[[file:scripts/][scripts/]] installs these into place on the running
-environment.
+=init.el= for Emacs (deployed to =~/.emacs.d/init.el=). A deployment
+script that installs these into place is planned for
+[[file:scripts/][scripts/]] but not yet written.
 
 * Environment
 
 This config targets an Arch Linux install running inside WSL. See
 [[file:docs/ENVIRONMENT.org][docs/ENVIRONMENT.org]] for the current list of installed system
 packages (pacman), development tools, and Node.js/NVM setup.
+[[file:scripts/install-packages.sh][scripts/install-packages.sh]]
+installs everything documented there: the pacman packages, =nvm= and
+the pinned Node.js version, and the global npm packages. It also
+prints a reminder that =antigravity= requires a manual install.
 
 * TODOs
 
