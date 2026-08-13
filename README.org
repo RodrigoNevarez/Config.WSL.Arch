@@ -13,7 +13,7 @@ to maintain that wiki.
 | Path                    | Purpose                                                              |
 |--------------------------+-----------------------------------------------------------------------|
 | =config/=                 | Tracked dotfiles (=.bashrc=, =.bash_profile=, =.gitconfig=, =init.el=) deployed onto the environment. |
-| =scripts/=                | Maintenance/deployment scripts for this repo (e.g. installing =config/= files into place). |
+| =scripts/=                | Maintenance/deployment scripts: =install-config.sh= deploys =config/= into =$HOME=, =install-packages.sh= installs the packages from =docs/ENVIRONMENT.org=. |
 | =docs/ENVIRONMENT.org=    | Snapshot report of installed pacman packages, dev tools, and Node/NVM versions. |
 | =docs/TODO/=              | Active Org-mode TODO files tracking in-progress environment setup tasks. |
 | =docs/TODO/done/=         | Completed TODO files, kept for history/reference.                    |
@@ -21,11 +21,13 @@ to maintain that wiki.
 
 * Config Files
 
-[[file:config/][config/]] holds the actual dotfiles tracked by this repo:
-=.bashrc=, =.bash_profile=, and =.gitconfig= for the shell, and
-=init.el= for Emacs (deployed to =~/.emacs.d/init.el=). A deployment
-script that installs these into place is planned for
-[[file:scripts/][scripts/]] but not yet written.
+[[file:config/][config/]] holds the actual dotfiles tracked by this repo, mirroring
+their =$HOME= layout: =.bashrc=, =.bash_profile=, and =.gitconfig= for
+the shell, and =.emacs.d/init.el= for Emacs.
+[[file:scripts/install-config.sh][scripts/install-config.sh]] copies
+every file under =config/= to the matching path under =$HOME=,
+backing up any existing file that differs before overwriting it. Run
+with =--dry-run= to preview changes without writing anything.
 
 * Environment
 
