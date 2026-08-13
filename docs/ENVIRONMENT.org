@@ -1,5 +1,5 @@
 #+TITLE: Environment Dependencies Report
-#+DATE: 2026-07-05
+#+DATE: 2026-08-13
 
 This document outlines the installed dependencies and development tools in this Arch Linux environment.
 
@@ -12,16 +12,17 @@ These packages are explicitly installed via the =pacman= package manager.
 | =base=        | 3-3          | Minimal package set to define a basic Arch Linux installation                    |
 | =base-devel=  | 1-2          | Basic tools for building Arch Linux packages                                     |
 | =emacs=       | 30.2-3       | The extensible, customizable, self-documenting real-time display editor          |
-| =git=         | 2.54.0-1     | Distributed version control system                                               |
-| =less=        | 1704-1       | A terminal pager program                                                         |
-| =nano=        | 9.0-1        | Small, free and friendly text editor                                             |
-| =openssh=     | 10.3p1-1     | SSH protocol implementation for remote login, command execution and file transfer |
-| =sudo=        | 1.9.17.p2-2  | Give certain users the ability to run some commands as root                      |
+| =git=         | 2.55.0-1     | Distributed version control system                                               |
+| =git-delta=   | 0.19.2-2     | Syntax-highlighting pager for git and diff output                                |
+| =less=        | 1:704-1      | A terminal pager program                                                         |
+| =nano=        | 9.1-1        | Small, free and friendly text editor                                             |
+| =openssh=     | 10.5p1-1     | SSH protocol implementation for remote login, command execution and file transfer |
+| =sudo=        | 1.9.17.p2-6  | Give certain users the ability to run some commands as root                      |
 | =tree=        | 2.3.2-1      | A directory listing program displaying a depth indented list of files            |
-| =vim=         | 9.2.0600-1   | Vi Improved, a powerful text editor                                              |
-| =wget=        | 1.25.0-5     | Network utility to retrieve content from web servers                             |
+| =vim=         | 9.2.0849-1   | Vi Improved, a powerful text editor                                              |
+| =wget=        | 1.25.0-6     | Network utility to retrieve content from web servers                             |
 
-Note: =curl= (v8.20.0-7) is also installed as a core dependency for several of the above packages.
+Note: =curl= (v8.21.0-1) is also installed as a core dependency for several of the above packages.
 
 Note: =realpath= is provided by =coreutils= (part of the =base= package). See [[file:dependencies/REALPATH.md][REALPATH.md]] for its installation and emulation guide.
 

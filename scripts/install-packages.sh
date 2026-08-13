@@ -12,6 +12,7 @@ PACMAN_PACKAGES=(
   curl
   emacs
   git
+  git-delta
   less
   nano
   openssh
