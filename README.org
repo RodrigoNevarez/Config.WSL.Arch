@@ -12,10 +12,20 @@ to maintain that wiki.
 
 | Path                    | Purpose                                                              |
 |--------------------------+-----------------------------------------------------------------------|
+| =config/=                 | Tracked dotfiles (=.bashrc=, =.bash_profile=, =.gitconfig=, =init.el=) deployed onto the environment. |
+| =scripts/=                | Maintenance/deployment scripts for this repo (e.g. installing =config/= files into place). |
 | =docs/ENVIRONMENT.org=    | Snapshot report of installed pacman packages, dev tools, and Node/NVM versions. |
 | =docs/TODO/=              | Active Org-mode TODO files tracking in-progress environment setup tasks. |
 | =docs/TODO/done/=         | Completed TODO files, kept for history/reference.                    |
 | =.agents/wikis/00-GUIDES/= | Guides for creating and maintaining the Org-mode wiki (index structure, UUID linking, detail-page generation). |
+
+* Config Files
+
+[[file:config/][config/]] holds the actual dotfiles tracked by this repo:
+=.bashrc=, =.bash_profile=, and =.gitconfig= for the shell, and
+=init.el= for Emacs (deployed to =~/.emacs.d/init.el=). A script under
+[[file:scripts/][scripts/]] installs these into place on the running
+environment.
 
 * Environment
 

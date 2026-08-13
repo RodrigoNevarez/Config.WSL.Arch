@@ -47,9 +47,7 @@ Installed globally for Node.js v24.16.0:
 | Package                     | Version  |
 |-----------------------------+----------|
 | =@anthropic-ai/claude-code=   | 2.1.229  |
-| =@google/gemini-cli=          | 0.46.0   |
 | =corepack=                    | 0.35.0   |
 | =npm=                         | 11.13.0  |
 
 -----
-/Report updated on 2026-07-05./
