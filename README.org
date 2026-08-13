@@ -1,0 +1,47 @@
+#+TITLE: rnevarez-arch-config
+#+AUTHOR: Rodrigo Nevarez
+#+OPTIONS: toc:nil num:nil
+
+Personal configuration and knowledge-base repository for an Arch Linux
+environment running under WSL. It tracks the environment's installed
+dependencies, ongoing setup/configuration work as Org-mode TODOs, and a
+small Emacs Org-mode wiki with guides used by an AI coding agent (AGY)
+to maintain that wiki.
+
+* Repository Layout
+
+| Path                    | Purpose                                                              |
+|--------------------------+-----------------------------------------------------------------------|
+| =docs/ENVIRONMENT.org=    | Snapshot report of installed pacman packages, dev tools, and Node/NVM versions. |
+| =docs/TODO/=              | Active Org-mode TODO files tracking in-progress environment setup tasks. |
+| =docs/TODO/done/=         | Completed TODO files, kept for history/reference.                    |
+| =.agents/wikis/00-GUIDES/= | Guides for creating and maintaining the Org-mode wiki (index structure, UUID linking, detail-page generation). |
+
+* Environment
+
+This config targets an Arch Linux install running inside WSL. See
+[[file:docs/ENVIRONMENT.org][docs/ENVIRONMENT.org]] for the current list of installed system
+packages (pacman), development tools, and Node.js/NVM setup.
+
+* TODOs
+
+Setup and configuration work is tracked as individual Org-mode files
+under [[file:docs/TODO/][docs/TODO/]], each named with a UUID and using standard Org
+=TODO=/=DONE= checklist syntax. Completed items are moved to
+[[file:docs/TODO/done/][docs/TODO/done/]].
+
+* Wiki Guides
+
+[[file:.agents/wikis/00-GUIDES/01-starters-guide.org][01-starters-guide.org]] and
+[[file:.agents/wikis/00-GUIDES/02-detail-pages.org][02-detail-pages.org]] define the conventions for this repository's
+Org-mode wiki: hierarchical index structure, mandatory UUID
+=:PROPERTIES:= drawers for linkable nodes, and the workflow for
+expanding a wiki node into its own detail page.
+
+* Notes
+
+- Files are kept in Org-mode (converted from Markdown) to support
+  Emacs Org features such as =TODO= states, properties drawers, and
+  UUID-based linking.
+- Emacs =~= backup files and a =history/= directory are ignored (see
+  =.gitignore=).
