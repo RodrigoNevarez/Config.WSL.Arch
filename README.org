@@ -17,7 +17,8 @@ repo.
 | =scripts/=                | Maintenance/deployment scripts: =install-config.sh= deploys =config/= into =$HOME=, =install-packages.sh= installs the packages from =docs/ENVIRONMENT.org=. |
 | =docs/ENVIRONMENT.org=    | Snapshot report of installed pacman packages, dev tools, and Node/NVM versions. |
 | =.agents/walkthroughs/=   | Index + per-topic packages of problem-solving walkthroughs. See [[file:.agents/walkthroughs/index.org][index.org]]. |
-| =.agents/walkthroughs/00-GUIDES/= | Guides for maintaining the index and expanding a topic into a walkthrough package. |
+| =.agents/walkthroughs/INSTRUCTIONS/= | Guides for maintaining the index and expanding a topic into a walkthrough package. |
+| =.agents/walkthroughs/SCRIPTS/validate-walkthroughs.py= | Checks every walkthrough package against the =INSTRUCTIONS/= rules (required sections, UUID validity/uniqueness, guide-version staleness). |
 | =.agents/wikis/00-GUIDES/= | Guides for creating and maintaining the Org-mode wiki (index structure, UUID linking, detail-page generation). |
 
 * Config Files
@@ -70,9 +71,14 @@ aren't the same thing. The behavior
 rules an agent follows to produce this — what has to be explained,
 which steps the human should run themselves, when to link out to the
 wiki instead of re-explaining — are formalized in
-[[file:.agents/walkthroughs/00-GUIDES/01-index-guide.org][01-index-guide.org]]
+[[file:.agents/walkthroughs/INSTRUCTIONS/00-conventions.org][00-conventions.org]],
+[[file:.agents/walkthroughs/INSTRUCTIONS/01-index-guide.org][01-index-guide.org]],
 and
-[[file:.agents/walkthroughs/00-GUIDES/02-expansion-guide.org][02-expansion-guide.org]].
+[[file:.agents/walkthroughs/INSTRUCTIONS/02-expansion-guide.org][02-expansion-guide.org]].
+[[file:.agents/walkthroughs/SCRIPTS/validate-walkthroughs.py][.agents/walkthroughs/SCRIPTS/validate-walkthroughs.py]]
+checks a package actually complies — required sections present, every
+UUID valid and globally unique, guide version current — instead of
+relying on the rules being followed from memory.
 
 * Wiki Guides
 

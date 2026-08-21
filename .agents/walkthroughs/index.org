@@ -5,8 +5,8 @@
 Each Level 3 node below is an issue. =TODO= means open — filed, not
 yet written up; =DONE= means closed — solved, with a full
 Problem/Guide/Notes package linked. See
-[[file:00-GUIDES/01-index-guide.org][01-index-guide.org]] for how to
-maintain this file and [[file:00-GUIDES/02-expansion-guide.org][02-expansion-guide.org]]
+[[file:INSTRUCTIONS/01-index-guide.org][01-index-guide.org]] for how to
+maintain this file and [[file:INSTRUCTIONS/02-expansion-guide.org][02-expansion-guide.org]]
 for how to close an issue by expanding it into a walkthrough package.
 
 * Environment & Tooling

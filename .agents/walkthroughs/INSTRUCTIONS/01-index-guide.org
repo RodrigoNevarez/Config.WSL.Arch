@@ -7,35 +7,15 @@ real problem was solved, written so the solving builds the human's own
 understanding instead of leaving them dependent on the agent for the
 next similar problem. See
 [[file:02-expansion-guide.org][02-expansion-guide.org]] for how an
-individual topic gets expanded into a full walkthrough package.
+individual topic gets expanded into a full walkthrough package, and
+[[file:00-conventions.org][00-conventions.org]] for the issue-tracker
+mental model and UUID rules both guides share — this file only covers
+what's specific to =index.org= itself.
 
 Walkthroughs are not scoped to any one project or repository's setup
 — a topic can be anything worth documenting this way. =index.org= is
 where every topic lives, expanded or not; the actual write-ups live
 alongside it as per-topic packages.
-
-* Mental Model: Treat It Like an Issue Tracker
-
-Every Level 3 node in the index is an *issue*, not a wiki article:
-
-- It has a *title* (the heading) and a *body* (a short description of
-  the problem).
-- It has a *state* — =TODO= (open) or =DONE= (closed) — using Org's
-  native TODO keyword on the heading itself, exactly like
-  =docs/=-style checklists already do in this repo. Open means "worth
-  documenting, not written up yet." Closed means "solved and fully
-  written up as a walkthrough package."
-- It can carry *tags* (Org's =:tag:= syntax) the same way an issue
-  carries labels — for cutting across categories (e.g. =:wsl:=,
-  =:networking:=) without forcing a topic into one rigid subfolder.
-- It has a stable *id* — the =:ID:= UUID — the same role an issue
-  number plays: a permanent handle that outlives renames.
-
-Closing an issue (=TODO= → =DONE=) happens by expanding it into a
-walkthrough package — see
-[[file:02-expansion-guide.org][02-expansion-guide.org]]. There is no
-separate "resolved but undocumented" state: if it's closed, the
-write-up exists.
 
 * Index Structure & Hierarchy
 
@@ -52,13 +32,13 @@ groups issues by project or milestone; it isn't what determines state:
   closed, the link to its walkthrough package.
 
 ** The UUID Placement Rule
-- *Requirement:* every Level 3 node MUST include a =:PROPERTIES:=
-  drawer containing a unique =:ID:= (UUIDv4). This UUID becomes the
-  name of the topic's package directory once it's closed (see
-  [[file:02-expansion-guide.org][02-expansion-guide.org]]).
-- *CRITICAL RULE:* **never write the UUID directly in the heading
-  text.** The heading must stay clean and human-readable; the UUID
-  lives strictly inside the properties drawer.
+Every Level 3 node MUST include a =:PROPERTIES:= drawer containing a
+unique =:ID:=, which becomes the name of the topic's package directory
+once it's closed (see
+[[file:02-expansion-guide.org][02-expansion-guide.org]]). See
+[[file:00-conventions.org][00-conventions.org]]'s UUID Convention
+section for the generation and placement rules — same rules, one
+place, shared with the walkthrough packages themselves.
 
 ** Open vs. Closed Issues
 - *Open (=TODO=)*: heading + =:ID:= drawer + a short description of
@@ -121,3 +101,9 @@ when the problem is actually being worked through.
 4. *Consistent naming*: heading text should be the same imperative,
    specific problem statement used as the =#+TITLE:= of the closed
    issue's =walkthrough.org=.
+5. *Run the validator* after editing =index.org= —
+   =SCRIPTS/validate-walkthroughs.py= checks every node has a valid,
+   unique =:ID:=, that DONE nodes have a matching package directory,
+   and that TODO nodes don't. It catches exactly the mistakes the
+   CRITICAL RULEs above are trying to prevent, mechanically instead of
+   by memory.

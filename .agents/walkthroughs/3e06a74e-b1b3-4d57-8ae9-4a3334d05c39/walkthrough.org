@@ -1,5 +1,6 @@
 #+TITLE: Give Arch bash an Ubuntu-like CLI theme
 #+DATE: 2026-08-12
+#+WALKTHROUGH_GUIDE_VERSION: 1
 
 * Problem
 

@@ -4,7 +4,8 @@ This guide details the procedure for expanding an
 [[file:../index.org][index.org]] topic node into its own standalone
 walkthrough package. See
 [[file:01-index-guide.org][01-index-guide.org]] for the index's own
-structure and UUID rules.
+structure, and [[file:00-conventions.org][00-conventions.org]] for the
+UUID and guide-version rules this file assumes throughout.
 
 * Purpose
 
@@ -34,12 +35,13 @@ execute themselves.
    =- *Walkthrough:* [[file:<uuid>/walkthrough.org][Topic Title]]=
    line under it, pointing at the package.
 
-** CRITICAL UUID PLACEMENT RULE
-Same rule as the index: **never write the UUID directly in a heading**
-in =walkthrough.org=. The directory name carries the UUID; headings
-inside the file stay clean and human-readable. The same applies one
-level down to steps — see =Step IDs= below: a step's UUID lives in a
-properties drawer, never in the step's visible text.
+** UUID Placement
+Same rule as the index, and the same rule one level down for steps
+(see the Guide section below): every UUID comes from a real generator
+and lives strictly inside a =:PROPERTIES:= drawer, never in visible
+heading or step text. See
+[[file:00-conventions.org][00-conventions.org]]'s UUID Convention
+section — it's the single copy of this rule; don't restate it.
 
 * When to Close an Issue
 
@@ -51,6 +53,14 @@ properties drawer, never in the step's visible text.
   one-liners with no learning value.
 
 * Required Structure of =walkthrough.org=
+
+The file header carries a =#+WALKTHROUGH_GUIDE_VERSION:= line, matching
+the current version in
+[[file:00-conventions.org][00-conventions.org]], directly under
+=#+DATE:=. This is what lets =SCRIPTS/validate-walkthroughs.py= tell a
+package written against the current rules apart from one that predates
+a later structural change — see 00-conventions.org's Guide Version
+section for what "current" means and when to bump it.
 
 ** 1. Problem
 Concrete symptom, not a vague description: include the actual command
@@ -75,9 +85,9 @@ a known dependency, or a pure verification step with no new mechanism
 to learn). When in doubt, prefer =*[you-run]*= — the bias this guide
 exists to create is toward the human doing more, not less.
 
-*CRITICAL RULE — every step gets an =:ID:= too.* Immediately under
-the step's text (before its source block), add a properties drawer
-with a fresh UUIDv4:
+*CRITICAL RULE — every step gets an =:ID:= too*, generated the same
+way and placed the same way as described in
+[[file:00-conventions.org][00-conventions.org]]'s UUID Convention:
 #+begin_src org
 - [ ] <Step text> *[you-run]*
   :PROPERTIES:
@@ -89,11 +99,10 @@ with a fresh UUIDv4:
   *Why:* <mechanism>
 #+end_src
 This gives every step the same stable, permanent handle a top-level
-issue gets in [[file:../index.org][index.org]] — see
-[[file:01-index-guide.org][01-index-guide.org]]'s issue-tracker mental
-model. It's what makes *Step-Level Expansion* (below) possible: a step
-can be pointed at, referenced, and later expanded into its own
-deep-dive file without ever renaming or restructuring the step itself.
+issue gets in [[file:../index.org][index.org]]. It's what makes
+*Step-Level Expansion* (below) possible: a step can be pointed at,
+referenced, and later expanded into its own deep-dive file without
+ever renaming or restructuring the step itself.
 
 Record real, verified command output when a step is completed — never
 a guessed or hypothetical result. An unverified step stays unchecked.
@@ -268,6 +277,7 @@ These are behavior rules for the agent, not just document formatting:
 #+BEGIN_SRC org
 #+TITLE: <Imperative, specific problem statement>
 #+DATE: <ISO date>
+#+WALKTHROUGH_GUIDE_VERSION: <current version, from 00-conventions.org>
 
 * Problem
 
@@ -350,3 +360,10 @@ These are behavior rules for the agent, not just document formatting:
 8. Write quiz questions against the Mental Model level, not the exact
    syntax — a question that only checks whether someone remembers a
    flag name tests recall of trivia, not understanding of the fix.
+9. *Run the validator* before considering a package done —
+   =SCRIPTS/validate-walkthroughs.py= checks the required sections all
+   exist, every step has a valid unique =:ID:=, the Quiz has exactly 5
+   questions and the Answer Key exactly 5 answers, and the guide
+   version matches current. Treat every CRITICAL RULE above as
+   something this script can and does check, not just prose to
+   remember.

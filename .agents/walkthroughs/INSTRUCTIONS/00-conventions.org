@@ -1,0 +1,72 @@
+#+TITLE: Walkthrough Shared Conventions
+#+WALKTHROUGH_GUIDE_VERSION: 1
+
+Single source of truth for conventions shared by
+[[file:01-index-guide.org][01-index-guide.org]] (the index) and
+[[file:02-expansion-guide.org][02-expansion-guide.org]] (walkthrough
+packages). Both reference this file instead of restating it — a rule
+here changes in exactly one place, not two that can drift apart.
+Checked mechanically by =SCRIPTS/validate-walkthroughs.py=.
+
+* UUID Convention
+
+Every linkable node in this system — an index issue, a walkthrough
+step — gets a permanent =:ID:= via a =:PROPERTIES:= drawer:
+
+#+begin_src org
+:PROPERTIES:
+:ID:       <uuid>
+:END:
+#+end_src
+
+- *CRITICAL RULE — generate, never invent.* Produce the UUID with a
+  real generator: =uuidgen=, or =python3 -c 'import uuid;
+  print(uuid.uuid4())'= if that's unavailable. Never hand-type a
+  UUID-shaped string. An LLM-typed "plausible" UUID isn't actually
+  random and risks colliding with one already in use.
+- *CRITICAL RULE — never in visible text.* The UUID lives strictly
+  inside the drawer — never in a heading, never in a checklist item's
+  own text. Headings and step descriptions stay clean and
+  human-readable.
+- *CRITICAL RULE — one namespace.* Every UUID under
+  =.agents/walkthroughs/= — index nodes, package directory names, and
+  individual walkthrough steps — must be globally unique across the
+  whole tree, not just within one file. Run
+  =SCRIPTS/validate-walkthroughs.py= to check; it will not catch a
+  collision by reading, only by comparing.
+
+* Issue-Tracker Mental Model
+
+Every Level 3 node in [[file:../index.org][index.org]] is an *issue*:
+title (heading), body (short description), state (=TODO=/=DONE= via
+Org's native keyword — open vs. closed), optional tags (Org's
+=:tag:= syntax, standing in for labels), and id (the =:ID:= UUID
+above, standing in for an issue number). Closing an issue means
+expanding it into a walkthrough package — see
+[[file:02-expansion-guide.org][02-expansion-guide.org]]. There's no
+"resolved but undocumented" state: closed implies the write-up exists.
+
+* Guide Version
+
+=#+WALKTHROUGH_GUIDE_VERSION:= at the top of this file is the current
+version of the required =walkthrough.org= structure. Every
+=walkthrough.org= must carry a matching
+=#+WALKTHROUGH_GUIDE_VERSION:= line directly under its =#+DATE:=.
+
+Bump the number here whenever the required structure actually changes
+— a section added, removed, or renamed, or a new CRITICAL RULE that
+changes what "valid" means. Existing walkthrough packages are *not*
+required to be retrofitted immediately when the version bumps — that
+would make every structural change a repo-wide scramble. Instead, a
+walkthrough's version number falling behind current is exactly the
+signal that it may now be missing something the guide requires;
+=SCRIPTS/validate-walkthroughs.py= reports this as a warning, not a
+failure, so staleness stays visible instead of silent.
+
+** Changelog
+
+- *v1* (2026-08-21): =* Problem=, =* TODO ... [x/n]= Guide (checklist
+  steps each carrying their own =:ID:=), =* Notes=, =* Search
+  Prompts=, =* Quiz= + =** Answer Key= (exactly 5 questions, exactly 5
+  answers). Baseline version — covers everything required as of the
+  =#+WALKTHROUGH_GUIDE_VERSION:= line's own introduction.
