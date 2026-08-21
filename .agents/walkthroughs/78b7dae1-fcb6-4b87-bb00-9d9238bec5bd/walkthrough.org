@@ -1,0 +1,192 @@
+#+TITLE: Use WSL-native npm instead of Windows npm
+#+DATE: 2026-08-12
+
+* Problem
+
+Inside the Arch WSL shell, =npm= resolves to the Windows install via
+interop instead of the nvm-managed WSL npm:
+
+#+begin_src sh
+[root@rodris arch]# which npm
+/mnt/c/Program Files/nodejs/npm
+#+end_src
+
+This happens because WSL's interop PATH (=/mnt/c/...=) is ahead of the
+nvm path, or nvm isn't loaded in the shell at all. As a result, global
+npm installs (e.g. =claude-code=) land in the Windows npm prefix
+(=C:\Users\rodri\AppData\Roaming\npm=) instead of inside WSL.
+
+* TODO Fix PATH / nvm loading [3/4]
+
+- [X] Confirm nvm is loaded in the shell *[you-run]*
+  :PROPERTIES:
+  :ID:       1f4c650f-f1ed-4248-a734-758694252122
+  :END:
+  #+begin_src sh
+  type nvm        # should show a shell function, not "not found"
+  #+end_src
+  If missing, add to =.bashrc=/=.zshrc=:
+  #+begin_src sh
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  #+end_src
+  *Why:* nvm isn't a real binary on =PATH= — it's a shell function
+  defined by sourcing =nvm.sh=. If that file was never sourced in this
+  shell, =nvm= (and its PATH-prepending of the active Node version)
+  simply doesn't exist yet, which is exactly why =npm= could fall
+  through to the Windows interop binary instead.
+
+  Confirmed: =~/.bashrc= sources =$NVM_DIR/nvm.sh=. (=type nvm=
+  reports "not found" only in non-interactive shells that don't
+  source =.bashrc= — not an issue in normal terminal sessions.)
+
+  *Extra step taken:* WSL terminals start login shells, which read
+  =~/.bash_profile=, not =~/.bashrc=, on startup. Added to
+  =~/.bash_profile= *[you-run]*:
+  #+begin_src sh
+  if [ -f ~/.bashrc ]; then
+      source ~/.bashrc
+  fi
+  #+end_src
+  *Why:* login shells and interactive non-login shells read different
+  startup files. =.bashrc='s nvm sourcing would never run on a fresh
+  WSL terminal unless something in =.bash_profile= (the file login
+  shells actually read) pulls it in.
+
+- [X] Check PATH order *[you-run]*
+  :PROPERTIES:
+  :ID:       2578e97a-9843-4703-a20c-04b0e34339ae
+  :END:
+  #+begin_src sh
+  echo $PATH
+  #+end_src
+  Confirm =$HOME/.nvm/versions/node/v24.16.0/bin= comes *before*
+  =/mnt/c/...=.
+  *Why:* when multiple directories on =PATH= contain a binary with the
+  same name, the shell uses whichever one appears *first* — so the
+  actual fix isn't "is nvm's npm installed", it's "does nvm's bin
+  directory win the race" against the Windows interop paths.
+
+  Confirmed: nvm's bin dir appears early in =$PATH=, well ahead of
+  all =/mnt/c/...= entries.
+
+- [ ] Best fix: stop Windows binaries from leaking into WSL's PATH *[you-run]*
+  :PROPERTIES:
+  :ID:       8ed9c83d-395d-408c-813f-63be7b97b589
+  :END:
+  Edit (or create) =/etc/wsl.conf=:
+  #+begin_src conf
+  [interop]
+  appendWindowsPath = false
+  #+end_src
+  Then, from PowerShell (outside WSL): =wsl --shutdown=, then reopen
+  the Arch terminal.
+  *Why:* the previous two steps fix the symptom for this shell/session
+  by winning the PATH race; this instead removes Windows paths from
+  WSL's PATH at the instance level, so nothing can shadow the nvm
+  binaries again regardless of shell startup file ordering. Marked
+  =*[you-run]*= since it edits root-owned system config and requires a
+  full WSL restart — not something to change out from under you
+  silently.
+
+  *Caveat:* this also hides other Windows tools (git.exe, code.exe,
+  etc.) from WSL shells — only do this if those aren't needed from
+  within WSL, or re-add specific ones to PATH manually.
+
+  *Skipped:* =/etc/wsl.conf= still has no =[interop]= block, but
+  PATH ordering alone already resolves =npm=/=node= correctly, so
+  this step turned out to be unnecessary.
+
+- [X] Verify *[agent-run]*
+  :PROPERTIES:
+  :ID:       e4f1e0d9-a9ad-4b3e-83d7-720be3889c7c
+  :END:
+  #+begin_src sh
+  which npm    # should now be ~/.nvm/versions/node/v24.16.0/bin/npm
+  which node
+  #+end_src
+  *Why:* pure confirmation that the earlier fix took effect — there's
+  no new mechanism to learn here, just checking both binaries now
+  resolve to the nvm-managed paths instead of =/mnt/c/...=.
+
+  Confirmed:
+  #+begin_src sh
+  which npm    # -> /root/.nvm/versions/node/v24.16.0/bin/npm
+  which node   # -> /root/.nvm/versions/node/v24.16.0/bin/node
+  #+end_src
+
+* Notes
+
+Once fixed, reinstall =claude-code= inside WSL so it's tracked
+correctly in [[file:../../../docs/ENVIRONMENT.org][ENVIRONMENT.org]]:
+
+#+begin_src sh
+npm install -g @anthropic-ai/claude-code
+#+end_src
+
+Done: =@anthropic-ai/claude-code@2.1.229= is installed under the WSL
+npm prefix; =which claude= resolves to
+=/root/.nvm/versions/node/v24.16.0/bin/claude=.
+
+- Related: [[file:../3e06a74e-b1b3-4d57-8ae9-4a3334d05c39/walkthrough.org][the Ubuntu-style bash theming walkthrough]] also
+  edits =~/.bashrc=/=~/.bash_profile= — worth doing both in the same
+  pass if either comes up again, to avoid clobbering each other.
+- *Concept-promotion candidate:* shell startup file load order
+  (login vs. interactive, =.bash_profile= vs =.bashrc=) and PATH
+  precedence have now shown up in two separate walkthroughs — worth a
+  dedicated wiki page instead of re-explaining next time.
+
+* Search Prompts
+
+- wsl npm resolves to windows npm instead of linux npm
+- wsl.conf appendWindowsPath interop explained
+- bash_profile vs bashrc difference login vs interactive shell
+- linux PATH environment variable order precedence explained
+- nvm command not found in new terminal
+- how does wsl interop pass windows PATH into linux
+
+* Quiz
+
+1. =which nvm= reports "not found" even in a shell where =nvm= works
+   fine interactively. Why doesn't that command prove nvm is broken?
+2. =.bashrc= already sourced =nvm.sh= before this fix, yet =npm= still
+   resolved to the Windows binary. Why didn't that alone fix it?
+3. Both a Windows =npm.exe= (via WSL interop) and the WSL-managed
+   =npm= exist on =PATH= at the same time. What actually decides which
+   one =which npm= (and every other command) resolves to?
+4. Setting =appendWindowsPath = false= in =wsl.conf= fixes this at the
+   instance level instead of per-shell. What do you gain by doing it
+   this way, and what do you give up?
+5. A =npm install -g <pkg>= command succeeds with no errors, but
+   =which <pkg's binary>= still can't find it afterward. What's the
+   first thing you'd check, and why?
+
+** Answer Key
+
+1. =nvm= isn't a binary anywhere on disk — it's a shell function
+   defined by *sourcing* =nvm.sh= into the current shell. =which= only
+   searches =PATH= for executable files, so it can never find a shell
+   function regardless of whether nvm is actually loaded and working.
+2. WSL terminals start *login* shells, which read =~/.bash_profile=,
+   not =~/.bashrc=, on startup. =.bashrc='s nvm-sourcing line never
+   ran unless something in =.bash_profile= pulled it in — a fresh
+   terminal never had nvm loaded in the first place, so it had nothing
+   to do with =PATH= ordering yet.
+3. =PATH= order. When multiple directories contain a same-named
+   executable, the shell uses whichever one is found *first* while
+   scanning =PATH= left to right — so the fix isn't "is the right npm
+   installed," it's "does the WSL npm's directory appear before the
+   =/mnt/c/...= interop directories."
+4. Per-shell =PATH= reordering only fixes shells where it's applied
+   and has to be redone if something re-introduces the Windows paths
+   ahead of nvm's. =appendWindowsPath = false= removes Windows paths
+   from WSL's =PATH= at the WSL-instance level, so no shell can ever
+   have this problem again — at the cost of losing direct access to
+   Windows executables (=code.exe=, =git.exe=, etc.) from within WSL
+   unless re-added manually.
+5. Whether the *npm prefix* the package installed into matches the
+   npm/node currently active on =PATH= — a global install goes into
+   whichever npm's configured prefix directory ran the install, and if
+   that's the Windows npm (because =PATH= still resolved there when
+   the install ran), the WSL shell will never see the new binary no
+   matter how correct the install looked.

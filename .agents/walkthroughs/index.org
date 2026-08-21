@@ -1,0 +1,30 @@
+#+TITLE: Walkthroughs Index
+#+DESCRIPTION: Central index of problem-solving walkthroughs — teaching artifacts, not fix logs.
+#+OPTIONS: toc:nil num:nil
+
+Each Level 3 node below is an issue. =TODO= means open — filed, not
+yet written up; =DONE= means closed — solved, with a full
+Problem/Guide/Notes package linked. See
+[[file:00-GUIDES/01-index-guide.org][01-index-guide.org]] for how to
+maintain this file and [[file:00-GUIDES/02-expansion-guide.org][02-expansion-guide.org]]
+for how to close an issue by expanding it into a walkthrough package.
+
+* Environment & Tooling
+  Shell, WSL, and dev-environment setup.
+
+** Shell
+*** DONE Give Arch bash an Ubuntu-like CLI theme
+    :PROPERTIES:
+    :ID:       3e06a74e-b1b3-4d57-8ae9-4a3334d05c39
+    :END:
+    Colorize the prompt and =ls=/=grep= output, and add Ubuntu-style
+    aliases, since Arch's default =bashrc= ships bare.
+    - *Walkthrough:* [[file:3e06a74e-b1b3-4d57-8ae9-4a3334d05c39/walkthrough.org][Give Arch bash an Ubuntu-like CLI theme]]
+
+*** DONE Use WSL-native npm instead of Windows npm
+    :PROPERTIES:
+    :ID:       78b7dae1-fcb6-4b87-bb00-9d9238bec5bd
+    :END:
+    Fix nvm loading and =PATH= ordering so =npm=/=node= resolve to the
+    WSL-managed install instead of the Windows interop binaries.
+    - *Walkthrough:* [[file:78b7dae1-fcb6-4b87-bb00-9d9238bec5bd/walkthrough.org][Use WSL-native npm instead of Windows npm]]

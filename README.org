@@ -4,9 +4,10 @@
 
 Personal configuration and knowledge-base repository for an Arch Linux
 environment running under WSL. It tracks the environment's installed
-dependencies, ongoing setup/configuration work as Org-mode TODOs, and a
-small Emacs Org-mode wiki with guides used by an AI coding agent (AGY)
-to maintain that wiki.
+dependencies, an index of problem-solving walkthroughs (not scoped to
+this repo alone), and a small Emacs Org-mode wiki — both maintained by
+an AI coding agent (AGY) following behavior guides checked into the
+repo.
 
 * Repository Layout
 
@@ -15,8 +16,8 @@ to maintain that wiki.
 | =config/=                 | Tracked dotfiles (=.bashrc=, =.bash_profile=, =.gitconfig=, =init.el=) deployed onto the environment. |
 | =scripts/=                | Maintenance/deployment scripts: =install-config.sh= deploys =config/= into =$HOME=, =install-packages.sh= installs the packages from =docs/ENVIRONMENT.org=. |
 | =docs/ENVIRONMENT.org=    | Snapshot report of installed pacman packages, dev tools, and Node/NVM versions. |
-| =docs/TODO/=              | Active Org-mode TODO files tracking in-progress environment setup tasks. |
-| =docs/TODO/done/=         | Completed TODO files, kept for history/reference.                    |
+| =.agents/walkthroughs/=   | Index + per-topic packages of problem-solving walkthroughs. See [[file:.agents/walkthroughs/index.org][index.org]]. |
+| =.agents/walkthroughs/00-GUIDES/= | Guides for maintaining the index and expanding a topic into a walkthrough package. |
 | =.agents/wikis/00-GUIDES/= | Guides for creating and maintaining the Org-mode wiki (index structure, UUID linking, detail-page generation). |
 
 * Config Files
@@ -39,12 +40,39 @@ installs everything documented there: the pacman packages, =nvm= and
 the pinned Node.js version, and the global npm packages. It also
 prints a reminder that =antigravity= requires a manual install.
 
-* TODOs
+* Walkthroughs
 
-Setup and configuration work is tracked as individual Org-mode files
-under [[file:docs/TODO/][docs/TODO/]], each named with a UUID and using standard Org
-=TODO=/=DONE= checklist syntax. Completed items are moved to
-[[file:docs/TODO/done/][docs/TODO/done/]].
+[[file:.agents/walkthroughs/index.org][.agents/walkthroughs/index.org]]
+is a hierarchical index of problem-solving *walkthroughs* — not scoped
+to this repo's own setup, but to any topic worth documenting this way.
+An index node can sit unexpanded (just a heading + description,
+flagging something worth writing up the next time it comes up) or
+expanded into its own package: a =<uuid>/= directory holding
+=walkthrough.org= plus any supporting files (scripts, logs, diffs)
+from that fix.
+
+Walkthroughs aren't fix logs: each one states the problem, walks
+through the fix with the reasoning behind every step, and notes what's
+worth remembering — deliberately so that solving a problem with the
+agent's help still builds the human's own understanding, instead of
+leaving them dependent on the agent for the next one. Every step in a
+walkthrough carries its own UUID too, so any step can be expanded on
+request into a standalone deep-dive file covering the mechanism,
+alternatives, and pitfalls behind it — the same open/expand pattern as
+the index, one level down. Every walkthrough also
+includes a *Search Prompts* section — real, typeable Google/Stack
+Overflow queries for further study, in place of the search-and-read
+cycle an AI assistant otherwise short-circuits entirely — and closes
+with a 5-question open-ended *Quiz* plus its Answer Key: retrieval
+practice intended to gate merging a PR that resulted from following
+the walkthrough, so "followed the steps" and "understood the fix"
+aren't the same thing. The behavior
+rules an agent follows to produce this — what has to be explained,
+which steps the human should run themselves, when to link out to the
+wiki instead of re-explaining — are formalized in
+[[file:.agents/walkthroughs/00-GUIDES/01-index-guide.org][01-index-guide.org]]
+and
+[[file:.agents/walkthroughs/00-GUIDES/02-expansion-guide.org][02-expansion-guide.org]].
 
 * Wiki Guides
 

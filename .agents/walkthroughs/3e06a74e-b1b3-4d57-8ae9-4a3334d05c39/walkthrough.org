@@ -1,0 +1,130 @@
+#+TITLE: Give Arch bash an Ubuntu-like CLI theme
+#+DATE: 2026-08-12
+
+* Problem
+
+Arch's default =/etc/bash.bashrc= / =~/.bashrc= ships a bare prompt and
+no color defaults, unlike Ubuntu's which colorizes the prompt, =ls=,
+and =grep= out of the box. Want the Arch WSL shell to feel similar.
+
+* TODO Port Ubuntu-style bash theming [4/4]
+
+- [X] Colorized, Ubuntu-style =PS1= (user@host in green, cwd in blue) *[you-run]*
+  :PROPERTIES:
+  :ID:       93be55ee-71d4-4add-a0b6-e3f2a73007d0
+  :END:
+  #+begin_src sh
+  PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+  #+end_src
+  *Why:* Arch's default =PS1= has no ANSI escape codes in it at all —
+  the prompt only gets color once =PS1= itself embeds escape
+  sequences, unlike Ubuntu's =bashrc= which sets a colorized =PS1= out
+  of the box.
+  (Ubuntu's actual default also conditionally adds =debian_chroot= and
+  switches to red for root — decide whether to keep that or simplify.)
+
+- [X] Enable color support for =ls= / =dircolors= *[you-run]*
+  :PROPERTIES:
+  :ID:       fb8b2595-9caa-497d-91d2-250a030be153
+  :END:
+  #+begin_src sh
+  if [ -x /usr/bin/dircolors ]; then
+      test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+      alias ls='ls --color=auto'
+      alias grep='grep --color=auto'
+      alias fgrep='fgrep --color=auto'
+      alias egrep='egrep --color=auto'
+  fi
+  #+end_src
+  *Why:* =ls= and =grep= don't colorize their output unless told to —
+  =--color=auto= is what turns it on, and =dircolors= is what supplies
+  the =LS_COLORS= map (file-type → color) that =ls= reads to decide
+  *which* colors to use. Ubuntu's =bashrc= wires this up by default;
+  Arch's doesn't.
+
+- [X] Ubuntu-style handy aliases (optional, check what's actually
+  useful before copying wholesale) *[you-run]*
+  :PROPERTIES:
+  :ID:       c8bd165a-c818-4f1f-a9f4-1db0de5d5413
+  :END:
+  #+begin_src sh
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
+  #+end_src
+  *Why:* these aren't a property of =ls= itself, just shell-level
+  shortcuts Ubuntu happens to predefine — replicating them is a distro
+  config choice, not a behavior difference in the underlying tool.
+
+- [X] Reload and verify *[you-run]*
+  :PROPERTIES:
+  :ID:       363dc2ed-5715-40d2-a8d6-12b289080733
+  :END:
+  #+begin_src sh
+  source ~/.bashrc
+  #+end_src
+  Confirm prompt colors and =ls=/=grep= coloring show up as expected.
+  *Why:* bash only reads =.bashrc= when a shell starts — editing the
+  file doesn't touch the shell you're already sitting in, so the
+  change is invisible until you re-source it (or open a new shell).
+
+* Notes
+
+- Since [[file:../78b7dae1-fcb6-4b87-bb00-9d9238bec5bd/walkthrough.org][the WSL-native npm walkthrough]] may also touch =~/.bashrc= (for nvm
+  loading), do both edits in the same pass to avoid clobbering each
+  other.
+- =starship= is already installed (see [[file:../../../docs/ENVIRONMENT.org][ENVIRONMENT.org]]) — consider
+  whether a starship prompt config is a cleaner path to an
+  Ubuntu-ish look than hand-rolling =PS1=.
+
+* Search Prompts
+
+- bash PS1 ansi escape codes explained
+- how to add colors to bash prompt PS1
+- dircolors LS_COLORS explained
+- ls --color=auto vs always vs never
+- bash why does my prompt not update after editing bashrc
+- starship prompt vs custom PS1 pros and cons
+
+* Quiz
+
+1. Bash's default =PS1= shows no color at all until you add something
+   specific to it. What exactly makes a prompt colored, and why does
+   Arch's default lack it while Ubuntu's doesn't?
+2. What two separate things does =dircolors= actually provide, and why
+   does =ls --color=auto= alone do nothing without them?
+3. You edit =~/.bashrc= in one terminal tab. A second, already-open
+   tab still shows the old, uncolored prompt. Why?
+4. =--color=auto= vs =--color=always= — what's the practical
+   difference, and why does =auto= matter specifically when =ls='s
+   output gets piped into another command?
+5. A teammate installs this same config but their prompt still shows
+   no color. What are the first two things you'd check, and why those
+   specifically rather than assuming the =PS1= line itself is wrong?
+
+** Answer Key
+
+1. =PS1= has no ANSI escape codes in it by default — color only
+   appears once =\033[...m= sequences are embedded directly in the
+   =PS1= string itself. Ubuntu's default =bashrc= already sets a
+   colorized =PS1=; Arch's ships a bare one.
+2. =dircolors= supplies the =LS_COLORS= mapping (file type/extension →
+   color code); =--color=auto= just tells =ls= to *consult* that
+   mapping, and only when writing to a terminal. Without =LS_COLORS=
+   set, there's no mapping to apply even with =--color=auto= on.
+3. Bash only reads =.bashrc= (or =.bash_profile=) when a shell starts.
+   Editing the file doesn't touch a shell that's already running and
+   holds its own copy of =PS1= in memory — it has to be re-sourced or
+   a new shell opened.
+4. =auto= only emits color codes when stdout is an actual terminal
+   (isatty); =always= emits them unconditionally. This matters because
+   piping colored output (raw escape codes) into another command —
+   =grep=, a file, a script — corrupts or confuses tools that expect
+   plain text; =auto= avoids that by turning color off automatically
+   once output isn't going to a terminal.
+5. Whether =.bashrc= is actually being sourced at all for their shell
+   type (login vs. interactive — see the WSL npm walkthrough for the
+   same class of bug with =.bash_profile=), and whether =LS_COLORS= is
+   actually exported in their environment. Assuming =PS1= itself is
+   broken skips past the more common failure: the config exists but
+   never gets loaded.

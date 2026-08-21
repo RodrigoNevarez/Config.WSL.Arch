@@ -1,0 +1,123 @@
+#+TITLE: Walkthroughs Index Maintenance Guide
+
+This guide details how to create, structure, and maintain
+[[file:../index.org][index.org]], the entry point for this
+repository's *walkthroughs*: teaching artifacts that document how a
+real problem was solved, written so the solving builds the human's own
+understanding instead of leaving them dependent on the agent for the
+next similar problem. See
+[[file:02-expansion-guide.org][02-expansion-guide.org]] for how an
+individual topic gets expanded into a full walkthrough package.
+
+Walkthroughs are not scoped to any one project or repository's setup
+— a topic can be anything worth documenting this way. =index.org= is
+where every topic lives, expanded or not; the actual write-ups live
+alongside it as per-topic packages.
+
+* Mental Model: Treat It Like an Issue Tracker
+
+Every Level 3 node in the index is an *issue*, not a wiki article:
+
+- It has a *title* (the heading) and a *body* (a short description of
+  the problem).
+- It has a *state* — =TODO= (open) or =DONE= (closed) — using Org's
+  native TODO keyword on the heading itself, exactly like
+  =docs/=-style checklists already do in this repo. Open means "worth
+  documenting, not written up yet." Closed means "solved and fully
+  written up as a walkthrough package."
+- It can carry *tags* (Org's =:tag:= syntax) the same way an issue
+  carries labels — for cutting across categories (e.g. =:wsl:=,
+  =:networking:=) without forcing a topic into one rigid subfolder.
+- It has a stable *id* — the =:ID:= UUID — the same role an issue
+  number plays: a permanent handle that outlives renames.
+
+Closing an issue (=TODO= → =DONE=) happens by expanding it into a
+walkthrough package — see
+[[file:02-expansion-guide.org][02-expansion-guide.org]]. There is no
+separate "resolved but undocumented" state: if it's closed, the
+write-up exists.
+
+* Index Structure & Hierarchy
+
+The index is Org-mode, organized hierarchically so related issues stay
+discoverable — this grouping is just for navigation, the way a tracker
+groups issues by project or milestone; it isn't what determines state:
+
+- *Level 1 (=*=)*: broad domains (e.g. =Environment & Tooling=,
+  =Software Engineering=). Add new domains as they come up — the index
+  is not limited to any fixed set.
+- *Level 2 (=**=)*: subcategories within a domain.
+- *Level 3 (=***=)*: an individual issue/topic. This is the node that
+  carries the =TODO=/=DONE= state and the =:ID:= property, and, once
+  closed, the link to its walkthrough package.
+
+** The UUID Placement Rule
+- *Requirement:* every Level 3 node MUST include a =:PROPERTIES:=
+  drawer containing a unique =:ID:= (UUIDv4). This UUID becomes the
+  name of the topic's package directory once it's closed (see
+  [[file:02-expansion-guide.org][02-expansion-guide.org]]).
+- *CRITICAL RULE:* **never write the UUID directly in the heading
+  text.** The heading must stay clean and human-readable; the UUID
+  lives strictly inside the properties drawer.
+
+** Open vs. Closed Issues
+- *Open (=TODO=)*: heading + =:ID:= drawer + a short description of
+  the problem, with no walkthrough link yet. This is a filed issue —
+  something worth documenting the next time it's actually solved.
+- *Closed (=DONE=)*: the same node, plus a =- *Walkthrough:*
+  [[file:<uuid>/walkthrough.org][...]]= line pointing at its package
+  directory.
+
+Don't force every issue open today to be closed immediately. Filing a
+topic costs nothing; writing the full walkthrough is worth doing only
+when the problem is actually being worked through.
+
+* Index Template
+
+#+BEGIN_SRC org
+#+TITLE: Walkthroughs Index
+#+DESCRIPTION: Central index of problem-solving walkthroughs — teaching artifacts, not fix logs.
+#+OPTIONS: toc:nil num:nil
+
+* <Domain>
+  <One line describing what this domain covers.>
+
+** <Subcategory>
+*** TODO <Problem Title>                                     :some-tag:
+    :PROPERTIES:
+    :ID:       xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    :END:
+    One or two sentences on what the problem is and why it matters.
+
+*** DONE <Another Problem Title>
+    :PROPERTIES:
+    :ID:       yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+    :END:
+    One or two sentences on what the problem is and why it matters.
+    - *Walkthrough:* [[file:yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy/walkthrough.org][Another Problem Title]]
+#+END_SRC
+
+* Linking & Navigation
+
+- Link to a topic's package from the index with a relative =file:=
+  link: =[[file:<uuid>/walkthrough.org][Topic Title]]=.
+- Link between two walkthrough packages (sibling directories) by
+  stepping up one level first: =[[file:../<other-uuid>/walkthrough.org][...]]=.
+- Link from a walkthrough back to something elsewhere in the
+  repository using a relative path from inside its package directory
+  (e.g. three levels up to reach the repo root: =../../../docs/...=).
+
+* Best Practices
+
+1. *Use relative paths* for every link, so the whole tree stays
+   portable.
+2. *Keep the hierarchy shallow but real* — don't invent Level 2
+   subcategories with only one topic in them; don't flatten a genuinely
+   broad domain into one bucket either. Use tags, not new
+   subcategories, for a topic that cuts across more than one.
+3. *Prune stale open issues* — if a filed topic turns out not to be
+   worth documenting, remove it rather than letting the index
+   accumulate dead entries.
+4. *Consistent naming*: heading text should be the same imperative,
+   specific problem statement used as the =#+TITLE:= of the closed
+   issue's =walkthrough.org=.

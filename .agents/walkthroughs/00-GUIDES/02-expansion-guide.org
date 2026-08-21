@@ -1,0 +1,352 @@
+#+TITLE: Walkthrough Expansion Guide
+
+This guide details the procedure for expanding an
+[[file:../index.org][index.org]] topic node into its own standalone
+walkthrough package. See
+[[file:01-index-guide.org][01-index-guide.org]] for the index's own
+structure and UUID rules.
+
+* Purpose
+
+An agent that silently fixes things produces working software and a
+human who has learned nothing. A walkthrough package exists to counter
+that: it forces the *why* behind a fix to be written down, not just
+the *what*, and it deliberately hands some steps back to the human to
+execute themselves.
+
+* Expansion Workflow
+
+1. *Locate or file the issue*: find the target =TODO= node in
+   [[file:../index.org][index.org]] by its =:ID:= (or file a new one,
+   per [[file:01-index-guide.org][01-index-guide.org]], if it isn't
+   there yet).
+2. *Create the package directory*: =.agents/walkthroughs/<uuid>/=,
+   using the node's own =:ID:= as the directory name.
+3. *Write the package's main file*: =.agents/walkthroughs/<uuid>/walkthrough.org=,
+   following the template below.
+4. *Add supporting files if useful*: a script that was actually
+   written as part of the fix, a captured log, a config diff — these
+   live alongside =walkthrough.org= in the same directory and get
+   linked from it with relative =file:= links, instead of pasting
+   everything inline as source blocks.
+5. *Close the issue*: in =index.org=, flip the node's state from
+   =TODO= to =DONE= and add a
+   =- *Walkthrough:* [[file:<uuid>/walkthrough.org][Topic Title]]=
+   line under it, pointing at the package.
+
+** CRITICAL UUID PLACEMENT RULE
+Same rule as the index: **never write the UUID directly in a heading**
+in =walkthrough.org=. The directory name carries the UUID; headings
+inside the file stay clean and human-readable. The same applies one
+level down to steps — see =Step IDs= below: a step's UUID lives in a
+properties drawer, never in the step's visible text.
+
+* When to Close an Issue
+
+- *Close it* (expand into a walkthrough) for any troubleshooting,
+  configuration, or setup task that took real diagnosis — more than
+  one obvious command, or anything where the fix isn't self-evident
+  from the error message.
+- *Leave it open, or don't even file it* for trivial, well-known
+  one-liners with no learning value.
+
+* Required Structure of =walkthrough.org=
+
+** 1. Problem
+Concrete symptom, not a vague description: include the actual command
+and its actual output showing the issue, and one sentence on why it
+matters. If the root cause is already known, state it; if not, that's
+fine — the Guide section is where it gets diagnosed.
+
+** 2. Guide
+A =* TODO <title> [x/n]= checklist, one Org checkbox per concrete step.
+
+*CRITICAL RULE — every step must include a =*Why:*= line.* A step
+that shows a command but not the mechanism it addresses is incomplete
+— it's a log entry, not a walkthrough. The =*Why:*= is the entire
+point of this document existing.
+
+*CRITICAL RULE — mark who runs each step.* Tag each item
+=*[you-run]*= or =*[agent-run]*=. Default to =*[you-run]*= for the
+step that contains the actual lesson (the diagnostic command, the
+config edit, the fix itself); reserve =*[agent-run]*= for mechanical
+scaffolding the human gets nothing from doing by hand (e.g. installing
+a known dependency, or a pure verification step with no new mechanism
+to learn). When in doubt, prefer =*[you-run]*= — the bias this guide
+exists to create is toward the human doing more, not less.
+
+*CRITICAL RULE — every step gets an =:ID:= too.* Immediately under
+the step's text (before its source block), add a properties drawer
+with a fresh UUIDv4:
+#+begin_src org
+- [ ] <Step text> *[you-run]*
+  :PROPERTIES:
+  :ID:       <uuid>
+  :END:
+  #+begin_src sh
+  <command>
+  #+end_src
+  *Why:* <mechanism>
+#+end_src
+This gives every step the same stable, permanent handle a top-level
+issue gets in [[file:../index.org][index.org]] — see
+[[file:01-index-guide.org][01-index-guide.org]]'s issue-tracker mental
+model. It's what makes *Step-Level Expansion* (below) possible: a step
+can be pointed at, referenced, and later expanded into its own
+deep-dive file without ever renaming or restructuring the step itself.
+
+Record real, verified command output when a step is completed — never
+a guessed or hypothetical result. An unverified step stays unchecked.
+
+** 3. Notes
+- Open questions or steps that were deliberately skipped, and why.
+- Links to related walkthrough packages
+  (=[[file:../<uuid>/walkthrough.org][...]]=).
+- *Concept-promotion flag*: if the same underlying concept shows up
+  across two or more walkthroughs (e.g. WSL PATH/interop behavior,
+  shell startup file load order), flag it here. That's the signal to
+  promote it into a permanent [[file:../../wikis/00-GUIDES/01-starters-guide.org][wiki]]
+  page instead of re-explaining it from scratch next time — link both
+  ways once promoted.
+
+** 4. Search Prompts
+
+Before AI assistants, this is how the knowledge actually got built: you
+hit an error, you typed something into Google or Stack Overflow, and
+the *act of searching and reading through results* — not just the
+final answer — is what built up a working mental model over years of
+doing it. Handing over a finished fix skips that entirely. This
+section hands it back: a short list of search-engine-ready queries the
+human can run themselves to keep studying the topic past what this
+walkthrough already covered.
+
+*CRITICAL RULE — write real, typeable queries, not topic labels.* Not
+=bash prompt colors= (a keyword) but =bash PS1 ansi escape codes
+explained= (a query a person would actually type and get a useful
+result from). Vague keywords return noise; a real query returns the
+specific Stack Overflow threads and docs an engineer would have found.
+
+Include a mix:
+- One or two queries tied directly to *this* fix (would surface the
+  exact Stack Overflow thread or doc this walkthrough is effectively
+  a condensed version of).
+- One or two queries aimed at the *general concept* underneath the fix
+  (the same generalization the step's Mental Model, if expanded, would
+  cover) — so the search habit trains toward transferable
+  understanding, not just this one symptom.
+
+** 5. Quiz
+
+A =* Quiz= heading with exactly five open-ended questions, testing
+whether the *why* actually landed — not whether the commands were
+copy-pasted correctly. This is what reinforcement-learning research
+calls retrieval practice: answering from memory, not re-reading, is
+what makes the understanding stick.
+
+*CRITICAL RULE — open-ended only, never yes/no or multiple-choice.*
+"Did editing =PS1= require sourcing =.bashrc=?" is a coin flip that
+can be guessed without understanding anything. "Why does editing
+=.bashrc= have no effect until the shell is reloaded?" forces an
+actual explanation to answer at all.
+
+*CRITICAL RULE — test the mechanism, not the memory.* A good question
+survives being asked about a slightly different, unfamiliar scenario
+(e.g. "if a *different* dotfile had this same symptom, how would you
+diagnose it?"). If the only way to answer is to have memorized this
+exact walkthrough's wording, rewrite the question.
+
+Include an =** Answer Key= subsection below the questions — enough
+detail for someone other than the original author to grade honestly,
+kept under its own subheading so a reviewer can write their own answer
+before checking it, instead of the answer sitting right next to the
+question.
+
+*Merge-gating rule:* if a pull request exists because someone followed
+this walkthrough to fix or build something, treat it as not mergeable
+until the author answers all 5 questions correctly — reviewer asks,
+author answers in their own words, reviewer checks against the Answer
+Key. This is what makes "I followed the walkthrough" and "I understood
+the walkthrough" distinguishable before the change lands.
+
+* Step-Level Expansion
+
+The =*Why:*= line is deliberately short — a sentence or two, enough to
+name the mechanism without turning every step into an essay. Some
+steps deserve more than that: real background theory, the mental
+model that generalizes to the next unrelated problem, alternatives
+that were considered and rejected, or the misconception that trips
+people up. That depth doesn't belong inline — it would bury the
+checklist. It belongs in its own file, written *only when asked for*.
+
+** Workflow
+
+1. The human (or the agent, if it judges a step is dense enough to
+   warrant it and offers this rather than doing it silently) points at
+   a step's =:ID:=.
+2. Create =.agents/walkthroughs/<package-uuid>/<step-uuid>.org= — a
+   sibling of =walkthrough.org=, inside the same package directory,
+   named after the step's own UUID.
+3. Write it following the *Step Detail Template* below — this is where
+   the deep *why* lives, not a longer command log.
+4. Add a line under the step in =walkthrough.org= pointing at it:
+   =*Detail:* [[file:<step-uuid>.org][<Step Title>]]=.
+
+A step's =:ID:= existing does *not* imply a detail file exists —
+exactly like an open issue in the index having no walkthrough yet.
+Most steps should stay at just a =*Why:*= line forever; expansion is
+for the few that are genuinely worth a standalone explanation.
+
+** Step Detail Template
+
+#+BEGIN_SRC org
+#+TITLE: <Step Title> — Detail
+#+DATE: <ISO date>
+
+Parent: [[file:walkthrough.org][<Walkthrough Title>]], step "<Step Title>".
+
+* Why This Works
+
+<The actual mechanism, in full — not the one-sentence version. Explain
+it the way you'd explain it to someone who needs to be able to reason
+about the next, differently-shaped instance of this problem, not just
+repeat this fix.>
+
+* Mental Model
+
+<The transferable principle underneath this step — what to generalize
+away from the specific commands, so the human recognizes this class of
+problem next time it shows up somewhere else entirely.>
+
+* Alternatives Considered
+
+<Other ways this step could have been done, and why this one won —
+trade-offs, not just "this also works.">
+
+* Common Pitfalls
+
+<What a beginner gets subtly wrong here, or what looks like it worked
+but didn't.>
+
+* Further Reading
+
+<Optional: man pages, specs, or a wiki page — link out rather than
+duplicating reference material that already exists elsewhere.>
+#+END_SRC
+
+* The Teaching Contract
+
+These are behavior rules for the agent, not just document formatting:
+
+1. Before executing a non-trivial diagnostic or fix step, offer it to
+   the human to run themselves rather than running it silently. Only
+   run it directly when they ask you to, or it's tagged
+   =*[agent-run]*=.
+2. Never omit the =*Why:*= to save time. If you don't know the why,
+   that's worth saying explicitly rather than skipping it.
+3. If a problem matches something already in the wiki or a prior
+   walkthrough, link to it instead of re-deriving it — but still write
+   the =*Why:*= for *this* instance, since the specific trigger
+   usually differs.
+4. When a walkthrough's checklist is fully resolved, do one pass over
+   its Notes to check whether anything qualifies for
+   concept-promotion.
+5. Don't write a step detail file unprompted — only create one when the
+   human asks for that step's UUID to be expanded, or when you flag
+   that a step looks dense enough to deserve one and the human agrees.
+   Depth is opt-in per step, the same way a whole issue is opt-in for
+   expansion in the first place.
+6. Never skip Search Prompts, and never fill it with lazy keyword
+   phrases — write the queries a person would actually type, the way
+   they'd have had to before an agent could just do the searching
+   (and the thinking) for them.
+7. Never skip Quiz, and never write a question answerable without
+   understanding (yes/no, or a question whose answer is just the
+   =*Why:*= line copied verbatim).
+
+* Template
+
+#+BEGIN_SRC org
+#+TITLE: <Imperative, specific problem statement>
+#+DATE: <ISO date>
+
+* Problem
+
+<Concrete symptom, with command + actual output, and why it matters>
+
+* TODO <Same imperative title> [0/n]
+
+- [ ] <Step 1> *[you-run]*
+  :PROPERTIES:
+  :ID:       xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  :END:
+  #+begin_src sh
+  <command>
+  #+end_src
+  *Why:* <the mechanism this step addresses>
+
+- [ ] <Step 2> *[agent-run]*
+  :PROPERTIES:
+  :ID:       yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+  :END:
+  #+begin_src sh
+  <command>
+  #+end_src
+  *Why:* <the mechanism this step addresses>
+  *Detail:* [[file:yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy.org][Step 2]]
+
+* Notes
+
+- <Open question, skipped step + reason, or related walkthrough link>
+- <Concept-promotion flag, if applicable>
+
+* Search Prompts
+
+- <Query that would surface the specific fix, e.g. the exact Stack
+  Overflow thread this problem matches>
+- <Query aimed at the general concept underneath the fix, for
+  transferable study>
+
+* Quiz
+
+1. <Open-ended question testing the why behind one step>
+2. <Open-ended question, ideally posed against a slightly different
+   scenario than the one actually solved here>
+3. <...>
+4. <...>
+5. <...>
+
+** Answer Key
+
+1. <Grading guidance — what a correct answer must include, not
+   necessarily verbatim wording>
+2. <...>
+3. <...>
+4. <...>
+5. <...>
+#+END_SRC
+
+* Best Practices
+
+1. One walkthrough per distinct problem — don't bundle unrelated
+   fixes into a single package just because they happened in the same
+   session.
+2. Weight steps toward =*[you-run]*=. If every step ends up
+   =*[agent-run]*=, this probably should not have been a walkthrough
+   — it's the agent doing the task and writing it up, which is exactly
+   the pattern this guide exists to avoid.
+3. Paste real, verified output — never a guess at what a command would
+   print.
+4. Keep supporting files (scripts, logs, diffs) inside the package
+   directory rather than inline, once they're more than a few lines.
+5. Prune recurring concepts out into the wiki rather than letting the
+   same explanation accumulate across multiple walkthrough packages.
+6. Every step gets an =:ID:=, but few steps get a detail file — an
+   ID with no detail file is the normal, expected state, not an
+   incomplete one.
+7. Search Prompts is not a bibliography — don't just paste a link you
+   already have. Write it as a query, so the human is the one who runs
+   the search, reads several results, and forms their own judgment
+   about which one actually answers it.
+8. Write quiz questions against the Mental Model level, not the exact
+   syntax — a question that only checks whether someone remembers a
+   flag name tests recall of trivia, not understanding of the fix.
